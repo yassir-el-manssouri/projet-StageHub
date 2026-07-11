@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Inscription - StageHub{% endblock %}
+
+{% block content %}
+<div class="auth-shell section-panel">
+    <h1 class="h3 mb-3">Creer un compte</h1>
+    <form method="post" class="compact-form" id="registerForm">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-6">{{ form.name.label_tag }}{{ form.name }}{{ form.name.errors }}</div>
+            <div class="col-md-6">{{ form.email.label_tag }}{{ form.email }}{{ form.email.errors }}</div>
+            <div class="col-md-6">{{ form.password1.label_tag }}{{ form.password1 }}{{ form.password1.errors }}</div>
+            <div class="col-md-6">{{ form.password2.label_tag }}{{ form.password2 }}{{ form.password2.errors }}</div>
+            <div class="col-md-6">{{ form.role.label_tag }}{{ form.role }}{{ form.role.errors }}</div>
+            <div class="col-md-6 student-field">{{ form.universite.label_tag }}{{ form.universite }}{{ form.universite.errors }}</div>
+            <div class="col-md-4 company-field">{{ form.nom_entreprise.label_tag }}{{ form.nom_entreprise }}{{ form.nom_entreprise.errors }}</div>
+            <div class="col-md-4 company-field">{{ form.secteur.label_tag }}{{ form.secteur }}{{ form.secteur.errors }}</div>
+            <div class="col-md-4 company-field">{{ form.email_entreprise.label_tag }}{{ form.email_entreprise }}{{ form.email_entreprise.errors }}</div>
+        </div>
+        {% if form.non_field_errors %}<div class="alert alert-danger mt-3">{{ form.non_field_errors }}</div>{% endif %}
+        <button class="btn btn-primary mt-3" type="submit">
+            <i class="bi bi-person-plus"></i> Inscription
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(() => {
+    const role = document.getElementById("id_role");
+    const sync = () => {
+        const isCompany = role.value === "entreprise";
+        document.querySelectorAll(".company-field").forEach((el) => el.classList.toggle("d-none", !isCompany));
+        document.querySelectorAll(".student-field").forEach((el) => el.classList.toggle("d-none", isCompany));
+    };
+    role?.addEventListener("change", sync);
+    sync();
+})();
+</script>
+{% endblock %}

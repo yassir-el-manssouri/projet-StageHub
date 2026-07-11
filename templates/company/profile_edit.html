@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Profil entreprise - StageHub{% endblock %}
+
+{% block content %}
+<div class="section-panel">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Modifier le profil entreprise</h1>
+        <a class="btn btn-outline-secondary" href="{% url 'company_dashboard' %}">Retour</a>
+    </div>
+    <form method="post" enctype="multipart/form-data" class="compact-form">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-6">{{ form.name.label_tag }}{{ form.name }}{{ form.name.errors }}</div>
+            <div class="col-md-6">{{ form.email.label_tag }}{{ form.email }}{{ form.email.errors }}</div>
+            <div class="col-md-6">{{ form.nom_entreprise.label_tag }}{{ form.nom_entreprise }}{{ form.nom_entreprise.errors }}</div>
+            <div class="col-md-6">{{ form.secteur.label_tag }}{{ form.secteur }}{{ form.secteur.errors }}</div>
+            <div class="col-md-6">{{ form.email_entreprise.label_tag }}{{ form.email_entreprise }}{{ form.email_entreprise.errors }}</div>
+            <div class="col-md-6">{{ form.telephone.label_tag }}{{ form.telephone }}{{ form.telephone.errors }}</div>
+            <div class="col-md-6">{{ form.adresse.label_tag }}{{ form.adresse }}{{ form.adresse.errors }}</div>
+            <div class="col-md-6">{{ form.site_web.label_tag }}{{ form.site_web }}{{ form.site_web.errors }}</div>
+            <div class="col-12">{{ form.description_entreprise.label_tag }}{{ form.description_entreprise }}{{ form.description_entreprise.errors }}</div>
+            <div class="col-md-6">{{ form.logo.label_tag }}{{ form.logo }}{{ form.logo.errors }}</div>
+            <div class="col-md-6 d-flex align-items-end">
+                <div class="form-check">{{ form.delete_logo }} {{ form.delete_logo.label_tag }}</div>
+            </div>
+        </div>
+        <button class="btn btn-primary mt-3" type="submit"><i class="bi bi-save"></i> Enregistrer</button>
+    </form>
+</div>
+{% endblock %}

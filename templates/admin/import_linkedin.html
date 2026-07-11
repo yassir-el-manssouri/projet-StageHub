@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Import LinkedIn - Administration StageHub{% endblock %}
+
+{% block content %}
+<div class="section-panel mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-1">
+        <h1 class="h3 mb-0"><i class="bi bi-linkedin text-primary"></i> Import LinkedIn</h1>
+        <a class="btn btn-outline-secondary" href="{% url 'admin_dashboard' %}">Retour au tableau de bord</a>
+    </div>
+    <p class="text-muted mb-0">
+        Importez automatiquement des offres de stage PFE depuis LinkedIn via JobSpy.
+        Les offres importées sont marquées <span class="badge text-bg-primary"><i class="bi bi-linkedin"></i> LinkedIn</span>
+        et leurs compétences sont auto-détectées.
+    </p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="section-panel">
+            <h2 class="h5 mb-3"><i class="bi bi-search"></i> Paramètres de recherche</h2>
+            <form method="post" class="compact-form">
+                {% csrf_token %}
+                <div class="mb-3">{{ form.query.label_tag }}{{ form.query }}{{ form.query.errors }}</div>
+                <div class="mb-3">{{ form.location.label_tag }}{{ form.location }}{{ form.location.errors }}</div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">{{ form.max_results.label_tag }}{{ form.max_results }}{{ form.max_results.errors }}</div>
+                    <div class="col-md-6">
+                        {{ form.hours_old.label_tag }}{{ form.hours_old }}{{ form.hours_old.errors }}
+                        <small class="text-muted">{{ form.hours_old.help_text }}</small>
+                    </div>
+                </div>
+                <div class="alert alert-info small mb-3">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <strong>Note :</strong> Le scraping LinkedIn peut prendre 30 à 90 secondes selon le nombre d'offres demandé. Ne fermez pas la page pendant l'opération.
+                </div>
+                <button class="btn btn-primary w-100" type="submit" id="btn-import">
+                    <i class="bi bi-cloud-download"></i> Lancer l'import LinkedIn
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="section-panel h-100">
+            <h2 class="h5 mb-3"><i class="bi bi-terminal"></i> Résultat de l'import</h2>
+            {% if output %}
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle-fill"></i> Import terminé avec succès.
+                </div>
+                <pre class="bg-light border rounded p-3 small" style="max-height:350px; overflow-y:auto;">{{ output }}</pre>
+                <a class="btn btn-outline-primary mt-2" href="{% url 'offres_index' %}?source=linkedin">
+                    <i class="bi bi-linkedin"></i> Voir les offres LinkedIn importées
+                </a>
+            {% elif error %}
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i> <strong>Erreur :</strong> {{ error }}
+                </div>
+                <div class="alert alert-secondary small">
+                    <strong>Solutions possibles :</strong>
+                    <ul class="mb-0 mt-1">
+                        <li>Vérifiez que <code>jobspy</code> est installé : <code>pip install jobspy</code></li>
+                        <li>LinkedIn peut bloquer temporairement les requêtes. Réessayez dans quelques minutes.</li>
+                        <li>Vérifiez votre connexion internet.</li>
+                    </ul>
+                </div>
+            {% else %}
+                <div class="d-flex align-items-center justify-content-center h-75 text-muted">
+                    <div class="text-center">
+                        <i class="bi bi-linkedin display-4 mb-3 d-block text-primary"></i>
+                        <p>Configurez les paramètres et lancez l'import pour voir les résultats ici.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="section-panel mt-4">
+    <h2 class="h5 mb-3"><i class="bi bi-terminal-fill"></i> Import via ligne de commande</h2>
+    <p class="text-muted small mb-2">Vous pouvez également déclencher l'import directement depuis le terminal :</p>
+    <pre class="bg-dark text-light rounded p-3 small"><code># Import standard
+python manage.py import_linkedin_jobs
+
+# Import personnalisé
+python manage.py import_linkedin_jobs --query "stage PFE informatique" --location "Casablanca" --max-results 30
+
+# Voir toutes les options
+python manage.py import_linkedin_jobs --help</code></pre>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelector('form.compact-form')?.addEventListener('submit', function() {
+    const btn = document.getElementById('btn-import');
+    if (btn) {
+        // Un léger délai permet au navigateur d'enregistrer la soumission avant de désactiver le bouton
+        setTimeout(() => {
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Import en cours...';
+            btn.disabled = true;
+        }, 10);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}FAQ - StageHub{% endblock %}
+
+{% block content %}
+<div class="section-panel">
+    <h1 class="h3 mb-3">Questions frequentes</h1>
+    <div class="accordion" id="faqAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">Comment postuler a une offre ?</button>
+            </h2>
+            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">Connectez-vous avec un compte etudiant verifie, ouvrez une offre puis joignez votre CV et votre lettre de motivation.</div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">Une entreprise peut-elle modifier ses offres ?</button>
+            </h2>
+            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">Oui. L'espace entreprise permet de creer, modifier, activer, desactiver et supprimer les offres rattachees au compte.</div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">Ou arrivent les emails en developpement ?</button>
+            </h2>
+            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">Par defaut, Django utilise la console. Les liens de reinitialisation du mot de passe s'affichent dans le terminal du serveur.</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

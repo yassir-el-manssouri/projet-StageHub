@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Offres de stage - StageHub{% endblock %}
+
+{% block content %}
+<div class="section-panel mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
+        <div>
+            <h1 class="h3 mb-1">Offres de stage</h1>
+            <p class="text-muted mb-0">Recherche par mot-clé, domaine ou localisation.</p>
+        </div>
+        {% if user.is_authenticated and user.role == 'entreprise' %}
+            <a class="btn btn-primary align-self-start" href="{% url 'offres_create' %}">
+                <i class="bi bi-plus-lg"></i> Publier
+            </a>
+        {% endif %}
+    </div>
+    <form class="row g-2">
+        <div class="col-md-3"><input class="form-control" name="q" value="{{ filters.q }}" placeholder="Mot-clé"></div>
+        <div class="col-md-3"><input class="form-control" name="domain" value="{{ filters.domain }}" placeholder="Domaine"></div>
+        <div class="col-md-2"><input class="form-control" name="location" value="{{ filters.location }}" placeholder="Localisation"></div>
+        <div class="col-md-2">
+            <select class="form-select" name="source">
+                <option value="" {% if not filters.source %}selected{% endif %}>Toutes les sources</option>
+                <option value="local" {% if filters.source == 'local' %}selected{% endif %}>Offres locales</option>
+                <option value="linkedin" {% if filters.source == 'linkedin' %}selected{% endif %}>LinkedIn</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-grid"><button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i> Chercher</button></div>
+    </form>
+</div>
+
+<div class="vstack gap-3">
+    {% for offer in offers %}
+        <article class="offer-row">
+            <div class="row g-3 align-items-center">
+                <div class="col-lg-8">
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <span class="badge text-bg-light border">{{ offer.domain }}</span>
+                        <span class="badge text-bg-light border"><i class="bi bi-geo-alt"></i> {{ offer.location }}</span>
+                        {% if offer.is_linkedin %}
+                            <span class="badge text-bg-primary"><i class="bi bi-linkedin"></i> LinkedIn</span>
+                        {% endif %}
+                    </div>
+                    <h2 class="h5 mb-1">{{ offer.title }}</h2>
+                    <p class="text-muted mb-2">{{ offer.company_profile.nom_entreprise }}{% if offer.duration %} — {{ offer.duration }}{% endif %}</p>
+                    {% if offer.required_tags.exists %}
+                        <div class="d-flex flex-wrap gap-1 mb-2">
+                            {% for tag in offer.required_tags.all|slice:":5" %}
+                                <span class="badge text-bg-light border border-primary text-primary">
+                                    {% if tag.icon %}<i class="bi {{ tag.icon }}"></i>{% endif %} {{ tag.name }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <p class="mb-0 text-muted small">{{ offer.description|truncatewords:22 }}</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    {% if offer.closing_date %}
+                        <p class="small text-muted mb-2"><i class="bi bi-calendar3"></i> Clôture : {{ offer.closing_date|date:"d/m/Y" }}</p>
+                    {% endif %}
+                    {% if offer.is_linkedin and offer.linkedin_url %}
+                        <a class="btn btn-outline-primary btn-sm mb-1" href="{{ offer.linkedin_url }}" target="_blank" rel="noopener">
+                            <i class="bi bi-linkedin"></i> Voir sur LinkedIn
+                        </a><br>
+                    {% endif %}
+                    <a class="btn btn-primary" href="{{ offer.get_absolute_url }}">Voir détail</a>
+                </div>
+            </div>
+        </article>
+    {% empty %}
+        <div class="section-panel text-center text-muted">Aucune offre disponible.</div>
+    {% endfor %}
+</div>
+{% endblock %}

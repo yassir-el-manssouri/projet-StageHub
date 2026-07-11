@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{{ offer.title }} - StageHub{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <article class="section-panel">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="badge text-bg-primary">{{ offer.domain }}</span>
+                <span class="badge text-bg-light border"><i class="bi bi-geo-alt"></i> {{ offer.location }}</span>
+                {% if offer.is_linkedin %}
+                    <span class="badge text-bg-primary"><i class="bi bi-linkedin"></i> LinkedIn</span>
+                {% endif %}
+                {% if offer.ai_score %}
+                    <span class="badge {% if offer.ai_score >= 70 %}text-bg-success{% elif offer.ai_score >= 40 %}text-bg-warning{% else %}text-bg-secondary{% endif %}">
+                        <i class="bi bi-bullseye"></i> Match {{ offer.ai_score }}%
+                    </span>
+                {% endif %}
+            </div>
+            <h1 class="h3">{{ offer.title }}</h1>
+            <p class="text-muted mb-3">
+                {{ offer.company_profile.nom_entreprise }}
+                {% if offer.is_linkedin and offer.linkedin_url %}
+                    &nbsp;—&nbsp;<a href="{{ offer.linkedin_url }}" target="_blank" rel="noopener" class="text-decoration-none">
+                        <i class="bi bi-linkedin"></i> Voir sur LinkedIn
+                    </a>
+                {% endif %}
+            </p>
+            <p class="mb-4">{{ offer.description|linebreaks }}</p>
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Durée</dt>
+                <dd class="col-sm-9">{{ offer.duration|default:"Non précisée" }}</dd>
+                <dt class="col-sm-3">Clôture</dt>
+                <dd class="col-sm-9">{{ offer.closing_date|date:"d/m/Y"|default:"Non précisée" }}</dd>
+                <dt class="col-sm-3">Statut</dt>
+                <dd class="col-sm-9">{{ offer.get_status_display }}</dd>
+            </dl>
+
+            {% if offer.required_tags.exists %}
+            <hr>
+            <h2 class="h6 mb-3"><i class="bi bi-tags-fill text-primary"></i> Compétences requises</h2>
+            <div class="d-flex flex-wrap gap-2">
+                {% for tag in offer.required_tags.all %}
+                    {% if user.is_authenticated and user.role == 'etudiant' %}
+                        {% if tag in match.matched_tags %}
+                            <span class="badge text-bg-success py-2 px-3">
+                                {% if tag.icon %}<i class="bi {{ tag.icon }}"></i>{% endif %}
+                                {{ tag.name }} <i class="bi bi-check-circle-fill ms-1"></i>
+                            </span>
+                        {% else %}
+                            <span class="badge text-bg-light border text-muted py-2 px-3">
+                                {% if tag.icon %}<i class="bi {{ tag.icon }}"></i>{% endif %}
+                                {{ tag.name }}
+                            </span>
+                        {% endif %}
+                    {% else %}
+                        <span class="badge text-bg-light border py-2 px-3">
+                            {% if tag.icon %}<i class="bi {{ tag.icon }}"></i>{% endif %}
+                            {{ tag.name }}
+                        </span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+        </article>
+    </div>
+
+    <div class="col-lg-4">
+
+        <aside class="section-panel">
+            <h2 class="h5 mb-3">Postuler</h2>
+            {% if user.is_authenticated and user.role == 'etudiant' %}
+                {% if already_applied %}
+                    <div class="alert alert-info mb-0">Vous avez déjà postulé à cette offre.</div>
+                {% elif offer.is_linkedin and offer.linkedin_url %}
+                    <p class="text-muted small mb-2">Cette offre provient de LinkedIn. Vous devez postuler directement sur leur plateforme.</p>
+                    <a href="{{ offer.linkedin_url }}" target="_blank" rel="noopener" class="btn btn-primary w-100">
+                        <i class="bi bi-linkedin"></i> Voir et postuler sur LinkedIn
+                    </a>
+                {% else %}
+                    <form method="post" action="{% url 'applications_store' offer.pk %}" enctype="multipart/form-data" class="compact-form">
+                        {% csrf_token %}
+                        {{ application_form.as_p }}
+                        <button class="btn btn-primary w-100" type="submit">
+                            <i class="bi bi-send"></i> Envoyer ma candidature
+                        </button>
+                    </form>
+                {% endif %}
+            {% elif user.is_authenticated %}
+                <p class="text-muted mb-0">La candidature est réservée aux comptes étudiants.</p>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-primary w-100">Se connecter</a>
+            {% endif %}
+        </aside>
+    </div>
+</div>
+{% endblock %}

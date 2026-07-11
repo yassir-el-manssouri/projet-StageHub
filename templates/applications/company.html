@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Candidatures reçues - StageHub{% endblock %}
+
+{% block content %}
+<div class="section-panel mb-4">
+    <h1 class="h3 mb-1">Candidatures reçues</h1>
+    <p class="text-muted mb-0">
+        {{ stats.total }} total &bull; {{ stats.pending }} en attente &bull;
+        {{ stats.accepted }} acceptées &bull; {{ stats.rejected }} refusées.
+    </p>
+</div>
+
+{% for offer_title, applications in grouped_applications %}
+    <section class="section-panel mb-4">
+        <h2 class="h5 mb-3">{{ offer_title }}</h2>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Candidat</th>
+                        <th>
+                            <i class="bi bi-bullseye text-success"></i>
+                            Score Matching
+                        </th>
+                        <th>Compétences matchées</th>
+                        <th>Statut</th>
+                        <th>Documents</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for application in applications %}
+                        <tr>
+                            <td>
+                                <strong>{{ application.student_profile.user.get_full_name|default:application.student_profile.user.email }}</strong>
+                                <div class="small text-muted">{{ application.student_profile.universite }}</div>
+                                {% if application.student_profile.specialite %}
+                                    <div class="small text-muted">{{ application.student_profile.specialite }}</div>
+                                {% endif %}
+                            </td>
+                            <td style="min-width:130px;">
+                                {% if application.match_score is not None %}
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" style="height:8px;" title="Score global {{ application.match_score }}%">
+                                            <div class="progress-bar {% if application.match_score >= 70 %}bg-success{% elif application.match_score >= 40 %}bg-warning{% else %}bg-danger{% endif %}"
+                                                 role="progressbar" style="width:{{ application.match_score }}%"></div>
+                                        </div>
+                                        <span class="fw-bold small {% if application.match_score >= 70 %}text-success{% elif application.match_score >= 40 %}text-warning{% else %}text-danger{% endif %}">
+                                            {{ application.match_score }}%
+                                        </span>
+                                    </div>
+                                    <div class="text-muted small mt-1">
+                                        {% if application.match_reasoning %}
+                                            <i class="bi bi-robot text-primary"></i> {{ application.match_reasoning }}
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted small">—</span>
+                                {% endif %}
+                            </td>
+                            <td style="max-width:200px;">
+                                {% if application.matched_tags %}
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% for tag in application.matched_tags|slice:":4" %}
+                                            <span class="badge text-bg-success" title="{{ tag.name }}">
+                                                {% if tag.icon %}<i class="bi {{ tag.icon }}"></i>{% endif %}
+                                                {{ tag.name }}
+                                            </span>
+                                        {% endfor %}
+                                        {% if application.matched_tags|length > 4 %}
+                                            <span class="badge text-bg-light border text-muted">+{{ application.matched_tags|length|add:"-4" }}</span>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted small">—</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge text-bg-{{ application.status_class }}">{{ application.get_status_display }}</span></td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-secondary" href="{% url 'applications_download_cv' application.pk %}">
+                                    <i class="bi bi-file-earmark-person"></i> CV
+                                </a>
+                                <a class="btn btn-sm btn-outline-secondary" href="{% url 'applications_download_cover_letter' application.pk %}">
+                                    <i class="bi bi-file-text"></i> Lettre
+                                </a>
+                            </td>
+                            <td class="text-end">
+                                <form method="post" action="{% url 'applications_accept' application.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-outline-success" type="submit">
+                                        <i class="bi bi-check-lg"></i> Accepter
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'applications_reject' application.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">
+                                        <i class="bi bi-x-lg"></i> Refuser
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="text-muted small mt-2 mb-0">
+            <i class="bi bi-info-circle"></i> Les candidats sont triés par score de matching décroissant.
+        </p>
+    </section>
+{% empty %}
+    <div class="section-panel text-center text-muted">Aucune candidature reçue.</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Mes candidatures - StageHub{% endblock %}
+
+{% block content %}
+<div class="section-panel mb-4">
+    <h1 class="h3 mb-1">Mes candidatures</h1>
+    <p class="text-muted mb-0">{{ stats.total }} candidatures, {{ stats.pending }} en attente, {{ stats.accepted }} acceptees.</p>
+</div>
+
+<div class="section-panel">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Offre</th>
+                    <th>Entreprise</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for application in applications %}
+                    <tr>
+                        <td><a href="{{ application.stage_offer.get_absolute_url }}">{{ application.stage_offer.title }}</a></td>
+                        <td>{{ application.stage_offer.company_profile.nom_entreprise }}</td>
+                        <td><span class="badge text-bg-{{ application.status_class }}">{{ application.get_status_display }}</span></td>
+                        <td>{{ application.applied_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-center text-muted py-4">Aucune candidature pour le moment.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

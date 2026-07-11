@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Administration - StageHub{% endblock %}
+
+{% block content %}
+<div class="section-panel mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-1">
+        <div>
+            <h1 class="h3 mb-1">Tableau de bord administrateur</h1>
+            <p class="text-muted mb-0">Vue globale des utilisateurs, offres et candidatures.</p>
+        </div>
+        <a class="btn btn-primary align-self-start" href="{% url 'admin_import_linkedin' %}">
+            <i class="bi bi-linkedin"></i> Importer depuis LinkedIn
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="metric"><span class="metric-value">{{ users_count }}</span><span class="metric-label">Utilisateurs</span></div></div>
+    <div class="col-md-3"><div class="metric"><span class="metric-value">{{ offers_count }}</span><span class="metric-label">Offres totales</span></div></div>
+    <div class="col-md-3"><div class="metric"><span class="metric-value">{{ applications_count }}</span><span class="metric-label">Candidatures</span></div></div>
+    <div class="col-md-3">
+        <div class="metric">
+            <span class="metric-value text-primary">{{ linkedin_offers_count }}</span>
+            <span class="metric-label"><i class="bi bi-linkedin"></i> Offres LinkedIn</span>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="section-panel h-100">
+            <h2 class="h5 mb-3">Répartition</h2>
+            <div class="vstack gap-3">
+                <div class="offer-row d-flex justify-content-between"><span>Étudiants</span><strong>{{ students_count }}</strong></div>
+                <div class="offer-row d-flex justify-content-between"><span>Entreprises</span><strong>{{ companies_count }}</strong></div>
+            </div>
+
+            <hr class="my-3">
+            <h3 class="h6 mb-2"><i class="bi bi-gear-fill text-muted"></i> Actions rapides</h3>
+            <div class="vstack gap-2">
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'admin_import_linkedin' %}">
+                    <i class="bi bi-linkedin"></i> Importer depuis LinkedIn
+                </a>
+                <a class="btn btn-outline-secondary btn-sm" href="{% url 'admin_offers_index' %}?source=linkedin">
+                    <i class="bi bi-list-ul"></i> Voir les offres LinkedIn ({{ linkedin_offers_count }})
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="section-panel h-100">
+            <h2 class="h5 mb-3">Dernières actions</h2>
+            <div class="vstack gap-2">
+                {% for log in recent_logs %}
+                    <div class="offer-row">
+                        <strong>{{ log.action }} {{ log.target_type }}</strong>
+                        <div class="small text-muted">{{ log.description }} — {{ log.created_at|date:"d/m/Y H:i" }}</div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted mb-0">Aucune action enregistrée.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

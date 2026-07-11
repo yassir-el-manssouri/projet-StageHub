@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil etudiant - StageHub{% endblock %}
+
+{% block content %}
+<div class="section-panel mb-4">
+    <h1 class="h3 mb-1">Bon retour {{ user.first_name|default:user.email }}</h1>
+    <p class="text-muted mb-0">Vos candidatures et les offres recommandees par le moteur de matching.</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="metric"><span class="metric-value">{{ stats.total }}</span><span class="metric-label">Total</span></div></div>
+    <div class="col-md-4"><div class="metric"><span class="metric-value">{{ stats.pending }}</span><span class="metric-label">En attente</span></div></div>
+    <div class="col-md-4"><div class="metric"><span class="metric-value">{{ stats.accepted }}</span><span class="metric-label">Acceptees</span></div></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="section-panel h-100">
+            <h2 class="h5 mb-3">Candidatures recentes</h2>
+            <div class="vstack gap-3">
+                {% for application in recent_applications %}
+                    <div class="offer-row">
+                        <strong>{{ application.stage_offer.title }}</strong>
+                        <div class="small text-muted">{{ application.stage_offer.company_profile.nom_entreprise }}</div>
+                        <span class="badge text-bg-{{ application.status_class }} mt-2">{{ application.get_status_display }}</span>
+                    </div>
+                {% empty %}
+                    <p class="text-muted mb-0">Aucune candidature pour le moment.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="row g-4 mb-4">
+            <div class="col-12">
+                <div class="section-panel h-100">
+                    <h2 class="h5 mb-3"><i class="bi bi-star-fill text-warning"></i> Offres recommandées (Entreprises partenaires)</h2>
+                    <div class="vstack gap-3">
+                        {% for offer in internal_offers %}
+                            <a class="offer-row text-decoration-none text-reset border rounded p-3 d-block" href="{{ offer.get_absolute_url }}">
+                                <div class="d-flex justify-content-between gap-2 mb-1">
+                                    <strong class="text-primary">{{ offer.title }}</strong>
+                                    {% if offer.ai_score %}<span class="badge text-bg-success">{{ offer.ai_score }}% Match</span>{% endif %}
+                                </div>
+                                <div class="small text-muted">{{ offer.company_profile.nom_entreprise }} <i class="bi bi-geo-alt ms-1"></i> {{ offer.location }}</div>
+                            </a>
+                        {% empty %}
+                            <p class="text-muted mb-0">Aucune offre interne recommandée pour le moment.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12">
+                <div class="section-panel h-100">
+                    <h2 class="h5 mb-3"><i class="bi bi-linkedin text-primary"></i> Offres recommandées (Depuis LinkedIn)</h2>
+                    <div class="vstack gap-3">
+                        {% for offer in linkedin_offers %}
+                            <a class="offer-row text-decoration-none text-reset border rounded p-3 d-block" href="{{ offer.get_absolute_url }}">
+                                <div class="d-flex justify-content-between gap-2 mb-1">
+                                    <strong class="text-primary">{{ offer.title }}</strong>
+                                    {% if offer.ai_score %}<span class="badge text-bg-success">{{ offer.ai_score }}% Match</span>{% endif %}
+                                </div>
+                                <div class="small text-muted">{{ offer.company_profile.nom_entreprise }} <i class="bi bi-geo-alt ms-1"></i> {{ offer.location }}</div>
+                            </a>
+                        {% empty %}
+                            <p class="text-muted mb-0">Aucune offre LinkedIn recommandée pour le moment.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

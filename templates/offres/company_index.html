@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Mes offres - StageHub{% endblock %}
+
+{% block content %}
+<div class="section-panel mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
+        <div>
+            <h1 class="h3 mb-1">Mes offres</h1>
+            <p class="text-muted mb-0">{{ stats.total }} offres, {{ stats.active }} actives.</p>
+        </div>
+        <a class="btn btn-primary" href="{% url 'offres_create' %}">
+            <i class="bi bi-plus-lg"></i> Publier une offre
+        </a>
+    </div>
+</div>
+
+<div class="section-panel">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Titre</th>
+                    <th>Domaine</th>
+                    <th>Statut</th>
+                    <th>Candidatures</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for offer in offers %}
+                    <tr>
+                        <td><a href="{{ offer.get_absolute_url }}" class="fw-semibold">{{ offer.title }}</a></td>
+                        <td>{{ offer.domain }}</td>
+                        <td><span class="badge text-bg-{% if offer.status == 'active' %}success{% else %}secondary{% endif %}">{{ offer.get_status_display }}</span></td>
+                        <td>{{ offer.applications_count }}</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary" href="{% url 'offres_edit' offer.pk %}">Modifier</a>
+                            <form method="post" action="{% url 'offres_destroy' offer.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('Confirmer la suppression ?')">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted py-4">Aucune offre creee.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

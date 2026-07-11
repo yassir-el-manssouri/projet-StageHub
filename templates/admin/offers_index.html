@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Admin offres - StageHub{% endblock %}
+
+{% block content %}
+<div class="section-panel mb-4">
+    <h1 class="h3 mb-3">Gestion des offres</h1>
+    <form class="row g-2">
+        <div class="col-md-4"><input class="form-control" name="q" value="{{ filters.q }}" placeholder="Titre"></div>
+        <div class="col-md-3"><input class="form-control" name="domain" value="{{ filters.domain }}" placeholder="Domaine"></div>
+        <div class="col-md-3"><input class="form-control" name="location" value="{{ filters.location }}" placeholder="Localisation"></div>
+        <div class="col-md-2 d-grid"><button class="btn btn-outline-primary" type="submit">Filtrer</button></div>
+    </form>
+</div>
+
+<div class="section-panel">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Titre</th>
+                    <th>Entreprise</th>
+                    <th>Domaine</th>
+                    <th>Candidatures</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for offer in offers %}
+                    <tr>
+                        <td><a href="{{ offer.get_absolute_url }}">{{ offer.title }}</a></td>
+                        <td>{{ offer.company_profile.nom_entreprise }}</td>
+                        <td>{{ offer.domain }}</td>
+                        <td>{{ offer.applications_count }}</td>
+                        <td class="text-end">
+                            <form method="post" action="{% url 'admin_offers_destroy' offer.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('Confirmer la suppression ?')">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted py-4">Aucune offre.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

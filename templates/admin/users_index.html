@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Utilisateurs - StageHub{% endblock %}
+
+{% block content %}
+<div class="section-panel mb-4">
+    <h1 class="h3 mb-3">Gestion des utilisateurs</h1>
+    <form class="row g-2">
+        <div class="col-md-7"><input class="form-control" name="q" value="{{ q }}" placeholder="Nom ou email"></div>
+        <div class="col-md-3">
+            <select class="form-select" name="role">
+                <option value="">Tous les roles</option>
+                <option value="etudiant" {% if role == 'etudiant' %}selected{% endif %}>Etudiant</option>
+                <option value="entreprise" {% if role == 'entreprise' %}selected{% endif %}>Entreprise</option>
+                <option value="administrateur" {% if role == 'administrateur' %}selected{% endif %}>Administrateur</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-grid"><button class="btn btn-outline-primary" type="submit">Filtrer</button></div>
+    </form>
+</div>
+
+<div class="section-panel">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in users %}
+                    <tr>
+                        <td>{{ account.get_full_name|default:account.username }}</td>
+                        <td>{{ account.email }}</td>
+                        <td>{{ account.get_role_display }}</td>
+                        <td class="text-end">
+                            <form method="post" action="{% url 'admin_users_destroy' account.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('Confirmer la suppression ?')">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-center text-muted py-4">Aucun utilisateur.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

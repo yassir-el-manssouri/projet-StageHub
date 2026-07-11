@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil entreprise - StageHub{% endblock %}
+
+{% block content %}
+<div class="section-panel mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+        <div>
+            <h1 class="h3 mb-1">Accueil entreprise</h1>
+            <p class="text-muted mb-0">Suivi des offres et des candidatures recues.</p>
+        </div>
+        <a href="{% url 'offres_create' %}" class="btn btn-primary align-self-start">
+            <i class="bi bi-plus-lg"></i> Publier une offre
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6"><div class="metric"><span class="metric-value">{{ offers_count }}</span><span class="metric-label">Offres</span></div></div>
+    <div class="col-md-6"><div class="metric"><span class="metric-value">{{ applications_count }}</span><span class="metric-label">Candidatures</span></div></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="section-panel h-100">
+            <h2 class="h5 mb-3">Candidatures recentes</h2>
+            <div class="vstack gap-3">
+                {% for application in recent_applications %}
+                    <div class="offer-row">
+                        <strong>{{ application.student_profile.user.get_full_name|default:application.student_profile.user.email }}</strong>
+                        <div class="small text-muted">{{ application.stage_offer.title }}</div>
+                        <span class="badge text-bg-{{ application.status_class }} mt-2">{{ application.get_status_display }}</span>
+                    </div>
+                {% empty %}
+                    <p class="text-muted mb-0">Aucune candidature recue.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="section-panel h-100">
+            <h2 class="h5 mb-3">Activite 6 mois</h2>
+            <div class="d-flex align-items-end gap-2" style="height: 180px;">
+                {% for count in application_counts %}
+                    <div class="d-flex flex-column align-items-center flex-fill">
+                        <div class="chart-bar w-100" style="height: {% widthratio count 10 150 %}px; min-height: 8px;"></div>
+                        <span class="small text-muted mt-2">{{ count }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="d-flex justify-content-between small text-muted mt-2">
+                {% for month in months %}<span>{{ month }}</span>{% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

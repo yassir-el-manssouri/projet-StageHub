@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - StageHub{% endblock %}
+
+{% block content %}
+<div class="section-panel">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">{{ title }}</h1>
+        <a class="btn btn-outline-secondary" href="{% url 'offres_company' %}">Retour</a>
+    </div>
+    <form method="post" class="compact-form">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-8">{{ form.title.label_tag }}{{ form.title }}{{ form.title.errors }}</div>
+            <div class="col-md-4">{{ form.status.label_tag }}{{ form.status }}{{ form.status.errors }}</div>
+            <div class="col-md-4">{{ form.domain.label_tag }}{{ form.domain }}{{ form.domain.errors }}</div>
+            <div class="col-md-4">{{ form.location.label_tag }}{{ form.location }}{{ form.location.errors }}</div>
+            <div class="col-md-2">{{ form.duration.label_tag }}{{ form.duration }}{{ form.duration.errors }}</div>
+            <div class="col-md-2">{{ form.closing_date.label_tag }}{{ form.closing_date }}{{ form.closing_date.errors }}</div>
+            <div class="col-12">{{ form.description.label_tag }}{{ form.description }}{{ form.description.errors }}</div>
+        </div>
+
+        <!-- Section Compétences requises -->
+        <hr class="my-4">
+        <h2 class="h5 mb-1"><i class="bi bi-tags-fill text-primary"></i> Compétences requises (tags)</h2>
+        <p class="text-muted small mb-3">Cochez les compétences techniques exigées pour ce stage. Cela permettra au moteur de matching de calculer un score de compatibilité objectif pour chaque candidat.</p>
+
+        {% if tags_by_category %}
+            <div class="row g-3">
+                {% for category, tags in tags_by_category.items %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="tag-category-card h-100">
+                        <h3 class="h6 fw-bold text-primary mb-2">
+                            <i class="bi bi-folder2-open"></i> {{ category }}
+                        </h3>
+                        {% for tag in tags %}
+                            <div class="form-check">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    name="required_tags"
+                                    value="{{ tag.pk }}"
+                                    id="req_tag_{{ tag.pk }}"
+                                    {% if tag.pk in selected_tag_ids %}checked{% endif %}
+                                >
+                                <label class="form-check-label small" for="req_tag_{{ tag.pk }}">
+                                    {% if tag.icon %}<i class="bi {{ tag.icon }} text-muted"></i>{% endif %}
+                                    {{ tag.name }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                Aucun tag disponible. <a href="/admin-stagehub/dashboard/">Demandez à l'administrateur</a> d'exécuter <code>python manage.py seed_skill_tags</code>.
+            </div>
+        {% endif %}
+
+        <button class="btn btn-primary mt-4" type="submit">
+            <i class="bi bi-save"></i> Enregistrer
+        </button>
+    </form>
+</div>
+{% endblock %}
